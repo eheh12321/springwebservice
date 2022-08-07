@@ -1,5 +1,8 @@
-{{>layout/header}}
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 
+<head th:replace="~{layout/header::header}"></head>
+<body>
 <h1>게시글 등록</h1>
 
 <div class="col-md-12">
@@ -21,6 +24,6 @@
         <a href="/" role="button" class="btn btn-secondary">취소</a>
         <button type="button" class="btn btn-primary" id="btn-save">등록</button>
     </div>
+    <th:block th:replace="~{layout/footer::footer}"></th:block>
 </div>
-
-{{>layout/footer}}
+</body>
