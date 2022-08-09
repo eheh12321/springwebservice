@@ -36,6 +36,17 @@ deploy:
     local_dir: deploy # 해당 위치의 파일들만 s3으로 전송한다
     wait-until-deployed: true
 
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY # Travis 웹에서 설정한 환경변수 사용
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: my-springboot-build
+    key: springwebservice.zip
+    bundle_type: zip
+    application: springboot-webservice
+    deployment_group: springboot-webservice-group
+    region: ap-northeast-2
+    wait-until-deployed: true
+
 # CI 완료 시 메일로 알람
 notifications:
   email:
