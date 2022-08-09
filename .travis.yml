@@ -17,6 +17,25 @@ cache:
 # master branch에 push되었을 때 수행되는 명령어
 script: "./gradlew clean build"
 
+# Travis CI에서 Build한 Jar 파일을 S3에 올리는 과정
+before_deploy:
+  # CodeDeploy는 Jar 파일을 인식할 수 없으므로 Jar + 기타 설정파일을 모아 zip으로 압축시킨다
+  - zip -r springwebservice * # 현 위치의 모든 파일을 springwebservice 이름의 zip 파일로 압축해라 (프로젝트 명으로 지정)
+  - mkdir -p deploy # Travis CI 실행 중 위치에서 deploy 디렉토리 생성
+  - mv springwebservice.zip deploy/springwebservice.zip # 파일 위치 이동
+
+# S3으로 파일 업로드 또는 CodeDeploy로 배포 등 외부 서비스와 연동될 행위 선언
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY # Travis 웹에서 설정한 환경변수 사용
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: my-springboot-build
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private
+    local_dir: deploy # 해당 위치의 파일들만 s3으로 전송한다
+    wait-until-deployed: true
+
 # CI 완료 시 메일로 알람
 notifications:
   email:
