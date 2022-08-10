@@ -3,7 +3,7 @@ version: 0.0
 os: linux
 files:
   - source: / # CodeDeploy에서 전달해준 파일 중 destination으로 이동시킬 대상 지정 (/ = 루트, 전체 파일)
-    destination: /home/ec2-user/app/step2/zip # source에서 지정된 파일을 받을 위치. 이후 Jar은 destination에서 옮겨진 파일들로 진행.
+    destination: /home/ec2-user/app/step3/zip # source에서 지정된 파일을 받을 위치. 이후 Jar은 destination에서 옮겨진 파일들로 진행.
     overwrite: yes
 
 # CodeDeploy에서 EC2 서버로 넘겨준 파일들 모두 ec2-user 권한을 갖도록 한다
@@ -15,7 +15,20 @@ permissions:
 
 # CodeDeploy 배포 단계에서 실행할 명령어 지정
 hooks:
-  ApplicationStart: # deploy.sh 파일을 ec2-user 권한으로 실행해라
-    - location: deploy.sh
+  AfterInstall:
+    - location: stop.sh # nginx와 연결되어있지 않는 스프링부트 종료
       timeout: 60
       runas: ec2-user
+  ApplicationStart:
+    - location: start.sh # nginx와 연결되어있지 않은 포트로 새 버전의 스프링부트 실행
+      timeout: 60
+      runas: ec2-user
+  ValidateService:
+    - location: health.sh # 새 스프링 부트가 정상적으로 실행됬는지 확인
+      timeout: 60
+      runas: ec2-user
+
+#  ApplicationStart: # deploy.sh 파일을 ec2-user 권한으로 실행해라 (중단 배포)
+#    - location: deploy.sh
+#      timeout: 60
+#      runas: ec2-user
